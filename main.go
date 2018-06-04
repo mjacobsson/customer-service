@@ -2,30 +2,45 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
-	"net/http"
 
 	"github.com/gorilla/mux"
+	"log"
+	"net/http"
+	"strconv"
 )
 
 type customer struct {
-	ID   string `json:"id"`
+	ID   int    `json:"id"`
 	Name string `json:"name"`
+}
+
+var customers = []customer{
+	customer{ID: 1, Name: "Customer_1"},
+	customer{ID: 2, Name: "Customer_2"},
+	customer{ID: 3, Name: "Customer_3"},
 }
 
 // GetCustomers GET /customers
 func GetCustomers(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "not implemented yet !")
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(customers)
 }
 
 // GetCustomer GET /customers/{id}
 func GetCustomer(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	requestID := params["id"]
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(customer{ID: requestID, Name: "Customer_" + requestID})
+	requestID, _ := strconv.Atoi(params["id"])
+	for _, customer := range customers {
+		if customer.ID == requestID {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(customer)
+
+			return
+		}
+	}
+	w.WriteHeader(http.StatusNotFound)
 }
 
 func main() {
