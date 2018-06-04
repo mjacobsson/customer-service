@@ -47,6 +47,7 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/customers", GetCustomers).Methods("GET")
 	router.HandleFunc("/customers/{id}", GetCustomer).Methods("GET")
+	log.Println("Customer service listening on port 8005")
 	if err := http.ListenAndServe(":8005", router); err != nil {
 		log.Fatal(err)
 	}
